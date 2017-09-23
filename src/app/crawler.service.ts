@@ -102,7 +102,7 @@ constructor(private http: HttpClient) {
     getSiteTree(url: String) {
         var echartEmitter = new EventEmitter();
         var treeEmitter = new EventEmitter();
-        this.oboeService = oboe(this.getOboeConfig(url, 1));
+        this.oboeService = oboe(this.getOboeConfig(url, 3));
         this.data = this.oboeService
             .node('echart', function(el){
                 echartEmitter.emit(el);
@@ -134,7 +134,22 @@ constructor(private http: HttpClient) {
                 legendHoverLink: true,
                 hoverAnimation:true,
                 animation: true,
-                data: data.nodes,
+                data: data.nodes.map(function (node) {
+                  let colorr = 'green';
+                  if(node.statusCode === 200) { colorr = 'green'; } else {colorr = 'red'; }
+                  return {
+                    value: node.value,
+                    name: node.name,
+                    label: node.value,
+                    symbol: node.symbol,
+                    size: node.size,
+                    itemStyle: {
+                      normal: {
+                        color: colorr
+                      }
+                    }
+                  };
+                }),
                 edges: data.links,
                 roam: true,
                 categories: [{}],
