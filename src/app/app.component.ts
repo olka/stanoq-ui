@@ -12,15 +12,14 @@ declare var window: Window;
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  title = 'Site tree generator';
   version:any;
   isSpinnerVisible:any;
   dataSub:Subscription;
   graphSub:Subscription;
   data: TreeModel;
   chartOption: any;
-  dataset:any;
   domain: string;
+  depth: string;
   error = {};
 
   constructor(private service: CrawlerService) {
@@ -41,8 +40,8 @@ export class AppComponent implements OnInit {
         this.service.getVersion().then(data => this.version = data.version).catch(error => this.error = error);
     }
 
-    getSiteTree(domain:string){
-        this.service.getSiteTree(String(domain))
+    getSiteTree(domain: string, depth: string){
+        this.service.getSiteTree(String(domain), Number(depth))
     }
 
    public logEvent(e: NodeEvent): void {

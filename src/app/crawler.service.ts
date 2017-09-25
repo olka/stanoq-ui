@@ -10,7 +10,7 @@ declare var oboe: any;
 
 @Injectable()
 export class CrawlerService {
-  private host = 'https://stanoq.herokuapp.com'//'http://localhost:9000'
+  private host = 'http://localhost:9000'///'https://stanoq.herokuapp.com'//
   private versionURL = this.host + '/version';
   private crawlerURL = this.host + '/crawlerStream';
 
@@ -66,15 +66,16 @@ export class CrawlerService {
       .catch(this.handleError);
   }
 
-  getOboeConfig(url: String, depth: number) {
+  getOboeConfig(url: String, depth: Number) {
     const rawData = {
-      'url': String(url),
+      'url': url,
       'depthLimit': depth,
       'timeout': 5,
       'exclusions': ['test1', 'test2']
     };
 
     const data = JSON.stringify(rawData);
+    console.log(data)
 
     const config = {
       'url': this.crawlerURL,
@@ -87,10 +88,10 @@ export class CrawlerService {
     return config;
   }
 
-  getSiteTree(url: String) {
+  getSiteTree(url: String, depth: Number) {
     const echartEmitter = new EventEmitter();
     const treeEmitter = new EventEmitter();
-    this.oboeService = oboe(this.getOboeConfig(url, 3));
+    this.oboeService = oboe(this.getOboeConfig(url, depth));
     this.data = this.oboeService
       .node('echart', function (el) {
         echartEmitter.emit(el);
