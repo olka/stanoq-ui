@@ -10,7 +10,7 @@ declare var oboe: any;
 
 @Injectable()
 export class CrawlerService {
-  private host = 'https://stanoq.herokuapp.com'
+  private host = 'https://stanoq.herokuapp.com'//'http://localhost:9000'
   private versionURL = this.host + '/version';
   private crawlerURL = this.host + '/crawlerStream';
 
@@ -127,15 +127,9 @@ export class CrawlerService {
         left: 'left',
         top: 'bottom',
         icon: 'circle',
-        data: categories.map(function (a) {
-          return {
-            name: a.name,
-            color: 'blue',
-            textStyle: {
-              color: 'red'
-            }
-          };
-        })
+        data: [{ name: 'green', inactiveColor: '#749f83'},
+          { name: 'yellow', inactiveColor: '#ca8622'},
+          { name: 'red', inactiveColor: '#008CBA'}]
       }],
       series: [{
         type: 'graph',
@@ -151,7 +145,7 @@ export class CrawlerService {
         data: data.nodes.map(function (node) {
           return {
             value: node.timeToLoad,
-            name: node.url.substring(urlLength),
+            name: node.url,
             categories: categories,
             category: node.category,
             symbolSize: ((node.size / initialSize) * 6) + 4,
@@ -165,8 +159,8 @@ export class CrawlerService {
         // edges: data.links,
         edges: data.links.map(function (link){
           return {
-            source: link.source.substring(urlLength),
-            target: link.target.substring(urlLength)
+            source: link.source,
+            target: link.target
           };
         }),
         edgeSymbol: ['circle', 'arrow'],
@@ -175,7 +169,7 @@ export class CrawlerService {
         label: {
           emphasis: {
             position: 'right',
-            formatter: '{b0}',
+            formatter: '{c0}',
             show: true
           },
           normal: {
