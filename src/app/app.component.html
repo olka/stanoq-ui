@@ -1,13 +1,20 @@
 <div style="text-align:center">
-    <h2>
-        {{title}}
-    </h2>
+  <div class="input-content" >
+    <div class="input-box">
+      <input class="input" #domain (keyup)="0" value="http://" (keyup.enter)="getSiteTree(domain.value)">
+    </div>
+    <select class="select">
+      <option>1</option>
+      <option>2</option>
+      <option>3</option>
+      <option>4</option>
+      <option>5</option>
+    </select>
+    <button class="button" type="submit" (click)="getSiteTree(domain.value)">Go</button>
+
+  </div>
     <div class="main-content">
         <div class="controls-box">
-            <div class="input-box">
-                <input class="input" #domain (keyup)="0" value="http://" (keyup.enter)="getSiteTree(domain.value)">
-            </div>
-            <button class="button" type="submit" (click)="getSiteTree(domain.value)">Go</button>
             <div echarts [options]="chartOption" class="demo-chart"></div>
         </div>
         <div class="tree-box">
