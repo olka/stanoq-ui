@@ -10,7 +10,7 @@ declare var oboe: any;
 
 @Injectable()
 export class CrawlerService {
-  private host = 'http://localhost:9000'///'https://stanoq.herokuapp.com'//
+  private host = 'https://stanoq.herokuapp.com'//'http://localhost:9000'
   private versionURL = this.host + '/version';
   private crawlerURL = this.host + '/crawlerStream';
 
@@ -75,7 +75,6 @@ export class CrawlerService {
     };
 
     const data = JSON.stringify(rawData);
-    console.log(data)
 
     const config = {
       'url': this.crawlerURL,

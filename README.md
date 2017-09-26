@@ -1,6 +1,14 @@
 # Webapp
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.2.1.
+## Further features
+
+0) CI support and autodeploy
+1) Map following on page scroll
+2) Connect left and right controls
+3) Play/Stop button with icons
+4) Persistence of previous results
+5) Analytics on results history 
+6) Spinner on server connection wait
 
 ## Development server
 
@@ -24,11 +32,6 @@ Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.
 Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
 Before running the tests make sure you are serving the app via `ng serve`.
 
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
-
-
 1) Deployment process https://github.com/angular-buch/angular-cli-ghpages
 
     npm install --save-dev gh-pages
@@ -37,4 +40,3 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
     "scripts": {
         "deploy": "ng build -prod -sm -ec -bh /reponame/ && gh-pages -d dist"
     }
-
