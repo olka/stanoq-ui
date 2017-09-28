@@ -2,6 +2,7 @@
 
 ## Further features
 
+Implement https://zoomcharts.com
 0) CI support and autodeploy
 1) Map following on page scroll
 2) Connect left and right controls
