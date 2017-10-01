@@ -16,8 +16,10 @@ export class AppComponent implements OnInit {
   isSpinnerVisible:any;
   dataSub:Subscription;
   graphSub:Subscription;
+  siteNameSub:Subscription;
   data: TreeModel;
   chartOption: any;
+  siteName: any;
   domain: string;
   depth: string;
   error = {};
@@ -27,13 +29,15 @@ export class AppComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.dataSub = this.service.dataProviderObservable.subscribe(data => this.data = data)
-        this.graphSub = this.service.graphObservable.subscribe(options => this.chartOption = options)
+        this.dataSub = this.service.dataProviderObservable.subscribe(data => this.data = data);
+        this.graphSub = this.service.graphObservable.subscribe(options => this.chartOption = options);
+        this.siteNameSub = this.service.siteNameObservable.subscribe(name => this.siteName = name);
     }
 
     ngOnDestroy() {
         this.dataSub.unsubscribe();
         this.graphSub.unsubscribe();
+        this.siteNameSub.unsubscribe();
     }
 
     getVersion(){
@@ -41,7 +45,7 @@ export class AppComponent implements OnInit {
     }
 
     getSiteTree(domain: string, depth: string){
-        this.service.getSiteTree(String(domain), Number(depth))
+        this.service.getSiteTree(String(domain), Number(depth));
     }
 
    public logEvent(e: NodeEvent): void {

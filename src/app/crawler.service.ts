@@ -1,7 +1,6 @@
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 import {Injectable, EventEmitter} from '@angular/core';
 import 'rxjs/add/operator/toPromise';
-import {Observable} from 'rxjs/Observable';
 import {Subscription} from 'rxjs/Subscription';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import {TreeModel} from 'ng2-tree';
@@ -10,8 +9,9 @@ declare var oboe: any;
 
 @Injectable()
 export class CrawlerService {
-  private host = 'https://stanoq.herokuapp.com'//'http://localhost:9000'
+  private host = 'http://localhost:9000' // 'https://stanoq.herokuapp.com'//
   private versionURL = this.host + '/version';
+  private nodeURL = this.host + '/node';
   private crawlerURL = this.host + '/crawlerStream';
 
   data: TreeModel = {
@@ -47,23 +47,39 @@ export class CrawlerService {
     }
   );
 
+  siteName: any = "http://websocket.org"
+
   dataProvider = new BehaviorSubject(this.data);
+  siteNameProvider = new BehaviorSubject(this.siteName);
   graphProvider = new BehaviorSubject(this.options);
   dataSub: Subscription;
+  siteNameSub: Subscription;
   graphSub: Subscription;
   dataProviderObservable = this.dataProvider.asObservable();
   graphObservable = this.graphProvider.asObservable();
+  siteNameObservable = this.siteNameProvider.asObservable();
   private oboeService: any;
 
 
   constructor(private http: HttpClient) {
     this.dataSub = this.dataProviderObservable.subscribe(data => this.data = data);
     this.graphSub = this.dataProviderObservable.subscribe(opts => this.options = opts);
+    const echartEmitter = new EventEmitter();
+    const siteNameEmitter = new EventEmitter();
+    echartEmitter.subscribe(el => this.graphProvider.next(this.getOptions(el)));
+    siteNameEmitter.subscribe(el => this.siteNameProvider.next(el));
+    this.getRandomNode().then(data => {
+      echartEmitter.emit(data[0]);
+      siteNameEmitter.emit(data[0].nodes[0].url);
+    }).catch(error => console.log(error));
   }
 
   getVersion() {
-    return this.http.get(this.versionURL).toPromise()
-      .catch(this.handleError);
+    return this.http.get(this.versionURL).toPromise().catch(this.handleError);
+  }
+
+  getRandomNode() {
+    return this.http.get(this.nodeURL).toPromise().catch(this.handleError);
   }
 
   getOboeConfig(url: String, depth: Number) {
@@ -115,8 +131,10 @@ export class CrawlerService {
 
   getOptions(data: any) {
     const initialSize = data.nodes[0].size;
-    const urlLength = data.nodes[0].url.length - 1;
+    const siteName = data.nodes[0].url;
+    const urlLength = siteName.length - 1;
     const categories = [{name: 'green'}, {name: 'yellow'}, {name: 'red'}];
+    console.log(data)
     return {
       animationDurationUpdate: 200,
       tooltip: {
@@ -157,12 +175,7 @@ export class CrawlerService {
           };
         }),
         // edges: data.links,
-        edges: data.links.map(function (link){
-          return {
-            source: link.source,
-            target: link.target
-          };
-        }),
+        edges: data.links,
         edgeSymbol: ['circle', 'arrow'],
         edgeSymbolSize: [2, 5],
         roam: false,
