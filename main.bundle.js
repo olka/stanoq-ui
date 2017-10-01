@@ -34,7 +34,7 @@ module.exports = module.exports.toString();
 /***/ "../../../../../src/app/app.component.html":
 /***/ (function(module, exports) {
 
-module.exports = "<div style=\"text-align:center\">\n  <div class=\"input-content\" >\n    <div class=\"input-box\">\n      <input class=\"input\" #domain (keyup)=\"0\" value=\"http://\" (keyup.enter)=\"getSiteTree(domain.value, depth.value)\">\n    </div>\n    <select #depth class=\"select\">\n      <option>1</option>\n      <option>2</option>\n      <option>3</option>\n      <option>4</option>\n      <option>5</option>\n    </select>\n    <button class=\"button\" type=\"submit\" (click)=\"getSiteTree(domain.value, depth.value)\">Go</button>\n\n  </div>\n    <div class=\"main-content\">\n        <div class=\"controls-box\">\n            <div echarts [options]=\"chartOption\" class=\"demo-chart\"></div>\n        </div>\n        <div class=\"tree-box\">\n            <tree [tree]=\"data\" (nodeSelected)=\"logEvent($event)\" (nodeRenamed)=\"renamedEvent($event)\" *ngIf=\"!isSpinnerVisible\"></tree>\n        </div>\n    </div>\n</div>\n\n\n"
+module.exports = "<div style=\"text-align:center\">\n  <div class=\"input-content\" >\n    <div class=\"input-box\">\n      <input class=\"input\" #domain (keyup)=\"0\" [ngModel]=\"siteName\" (keyup.enter)=\"getSiteTree(domain.value, depth.value)\">\n    </div>\n    <select #depth class=\"select\">\n      <option>1</option>\n      <option>2</option>\n      <option>3</option>\n      <option>4</option>\n      <option>5</option>\n    </select>\n    <button class=\"button\" type=\"submit\" (click)=\"getSiteTree(domain.value, depth.value)\">Go</button>\n\n  </div>\n    <div class=\"main-content\">\n        <div class=\"controls-box\">\n            <div echarts [options]=\"chartOption\" class=\"demo-chart\"></div>\n        </div>\n        <div class=\"tree-box\">\n            <tree [tree]=\"data\" (nodeSelected)=\"logEvent($event)\" (nodeRenamed)=\"renamedEvent($event)\" *ngIf=\"!isSpinnerVisible\"></tree>\n        </div>\n    </div>\n</div>\n\n\n"
 
 /***/ }),
 
@@ -66,10 +66,12 @@ var AppComponent = (function () {
         var _this = this;
         this.dataSub = this.service.dataProviderObservable.subscribe(function (data) { return _this.data = data; });
         this.graphSub = this.service.graphObservable.subscribe(function (options) { return _this.chartOption = options; });
+        this.siteNameSub = this.service.siteNameObservable.subscribe(function (name) { return _this.siteName = name; });
     };
     AppComponent.prototype.ngOnDestroy = function () {
         this.dataSub.unsubscribe();
         this.graphSub.unsubscribe();
+        this.siteNameSub.unsubscribe();
     };
     AppComponent.prototype.getVersion = function () {
         var _this = this;
@@ -188,6 +190,7 @@ var CrawlerService = (function () {
         this.http = http;
         this.host = 'https://stanoq.herokuapp.com'; //'http://localhost:9000'
         this.versionURL = this.host + '/version';
+        this.nodeURL = this.host + '/site';
         this.crawlerURL = this.host + '/crawlerStream';
         this.data = {
             value: 'Programming languages by programming paradigm',
@@ -203,33 +206,42 @@ var CrawlerService = (function () {
             ]
         };
         this.options = this.getOptions({
-            'nodes': [{
-                    'url': '1', 'timeToLoad': 10, 'category': 'green', 'size': 10000
-                }, {
-                    'url': '2', 'timeToLoad': 15, 'category': 'green', 'size': 10000
-                }, {
-                    'url': '3', 'timeToLoad': 20, 'category': 'yellow', 'size': 10000
-                }, {
-                    'url': '4', 'timeToLoad': 20, 'category': 'red', 'size': 10000
+            'nodes': [{ 'url': '1', 'timeToLoad': 10, 'category': 'green', 'size': 10000
+                }, { 'url': '2', 'timeToLoad': 15, 'category': 'green', 'size': 10000
+                }, { 'url': '3', 'timeToLoad': 20, 'category': 'yellow', 'size': 10000
+                }, { 'url': '4', 'timeToLoad': 20, 'category': 'red', 'size': 10000
                 }],
-            'links': [{
-                    'source': '1', 'target': '2'
-                }, {
-                    'source': '3', 'target': '4'
-                }, {
-                    'source': '4', 'target': '1'
+            'links': [{ 'source': '1', 'target': '2'
+                }, { 'source': '3', 'target': '4'
+                }, { 'source': '4', 'target': '1'
                 }]
         });
+        this.siteName = "http://websocket.org";
         this.dataProvider = new __WEBPACK_IMPORTED_MODULE_3_rxjs_BehaviorSubject__["BehaviorSubject"](this.data);
+        this.siteNameProvider = new __WEBPACK_IMPORTED_MODULE_3_rxjs_BehaviorSubject__["BehaviorSubject"](this.siteName);
         this.graphProvider = new __WEBPACK_IMPORTED_MODULE_3_rxjs_BehaviorSubject__["BehaviorSubject"](this.options);
         this.dataProviderObservable = this.dataProvider.asObservable();
         this.graphObservable = this.graphProvider.asObservable();
+        this.siteNameObservable = this.siteNameProvider.asObservable();
         this.dataSub = this.dataProviderObservable.subscribe(function (data) { return _this.data = data; });
         this.graphSub = this.dataProviderObservable.subscribe(function (opts) { return _this.options = opts; });
+        var echartEmitter = new __WEBPACK_IMPORTED_MODULE_1__angular_core__["EventEmitter"]();
+        var treeEmitter = new __WEBPACK_IMPORTED_MODULE_1__angular_core__["EventEmitter"]();
+        var siteNameEmitter = new __WEBPACK_IMPORTED_MODULE_1__angular_core__["EventEmitter"]();
+        echartEmitter.subscribe(function (el) { return _this.graphProvider.next(_this.getOptions(el)); });
+        siteNameEmitter.subscribe(function (el) { return _this.siteNameProvider.next(el); });
+        treeEmitter.subscribe(function (el) { return _this.dataProvider.next(el); });
+        this.getRandomNode().then(function (data) {
+            echartEmitter.emit(data[0].echart);
+            treeEmitter.emit(data[0].node);
+            siteNameEmitter.emit(data[0].config.url);
+        }).catch(function (error) { return console.log(error); });
     }
     CrawlerService.prototype.getVersion = function () {
-        return this.http.get(this.versionURL).toPromise()
-            .catch(this.handleError);
+        return this.http.get(this.versionURL).toPromise().catch(this.handleError);
+    };
+    CrawlerService.prototype.getRandomNode = function () {
+        return this.http.get(this.nodeURL).toPromise().catch(this.handleError);
     };
     CrawlerService.prototype.getOboeConfig = function (url, depth) {
         var rawData = {
@@ -276,8 +288,10 @@ var CrawlerService = (function () {
     };
     CrawlerService.prototype.getOptions = function (data) {
         var initialSize = data.nodes[0].size;
-        var urlLength = data.nodes[0].url.length - 1;
+        var siteName = data.nodes[0].url;
+        var urlLength = siteName.length - 1;
         var categories = [{ name: 'green' }, { name: 'yellow' }, { name: 'red' }];
+        console.log(data);
         return {
             animationDurationUpdate: 200,
             tooltip: {
@@ -318,12 +332,7 @@ var CrawlerService = (function () {
                         };
                     }),
                     // edges: data.links,
-                    edges: data.links.map(function (link) {
-                        return {
-                            source: link.source,
-                            target: link.target
-                        };
-                    }),
+                    edges: data.links,
                     edgeSymbol: ['circle', 'arrow'],
                     edgeSymbolSize: [2, 5],
                     roam: false,
