@@ -9,9 +9,9 @@ declare var oboe: any;
 
 @Injectable()
 export class CrawlerService {
-  private host = 'http://localhost:9000' // 'https://stanoq.herokuapp.com'//
+  private host = 'https://stanoq.herokuapp.com'//'http://localhost:9000'//
   private versionURL = this.host + '/version';
-  private nodeURL = this.host + '/node';
+  private nodeURL = this.host + '/site';
   private crawlerURL = this.host + '/crawlerStream';
 
   data: TreeModel = {
@@ -28,21 +28,14 @@ export class CrawlerService {
   };
   options: any = this.getOptions(
     {
-      'nodes': [{
-        'url': '1', 'timeToLoad': 10, 'category': 'green', 'size': 10000
-      }, {
-        'url': '2', 'timeToLoad': 15, 'category': 'green', 'size': 10000
-      }, {
-        'url': '3', 'timeToLoad': 20, 'category': 'yellow', 'size': 10000
-      }, {
-        'url': '4', 'timeToLoad': 20, 'category': 'red', 'size': 10000
+      'nodes': [{'url': '1', 'timeToLoad': 10, 'category': 'green', 'size': 10000
+      }, {'url': '2', 'timeToLoad': 15, 'category': 'green', 'size': 10000
+      }, {'url': '3', 'timeToLoad': 20, 'category': 'yellow', 'size': 10000
+      }, {'url': '4', 'timeToLoad': 20, 'category': 'red', 'size': 10000
       }],
-      'links': [{
-        'source': '1', 'target': '2'
-      }, {
-        'source': '3', 'target': '4'
-      }, {
-        'source': '4', 'target': '1'
+      'links': [{'source': '1', 'target': '2'
+      }, {'source': '3', 'target': '4'
+      }, {'source': '4', 'target': '1'
       }]
     }
   );
@@ -65,12 +58,15 @@ export class CrawlerService {
     this.dataSub = this.dataProviderObservable.subscribe(data => this.data = data);
     this.graphSub = this.dataProviderObservable.subscribe(opts => this.options = opts);
     const echartEmitter = new EventEmitter();
+    const treeEmitter = new EventEmitter();
     const siteNameEmitter = new EventEmitter();
     echartEmitter.subscribe(el => this.graphProvider.next(this.getOptions(el)));
     siteNameEmitter.subscribe(el => this.siteNameProvider.next(el));
+    treeEmitter.subscribe(el => this.dataProvider.next(el));
     this.getRandomNode().then(data => {
-      echartEmitter.emit(data[0]);
-      siteNameEmitter.emit(data[0].nodes[0].url);
+      echartEmitter.emit(data[0].echart);
+      treeEmitter.emit(data[0].node);
+      siteNameEmitter.emit(data[0].config.url);
     }).catch(error => console.log(error));
   }
 

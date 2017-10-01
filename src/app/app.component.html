@@ -17,9 +17,9 @@
         <div class="controls-box">
             <div echarts [options]="chartOption" class="demo-chart"></div>
         </div>
-        <!--<div class="tree-box">-->
-            <!--<tree [tree]="data" (nodeSelected)="logEvent($event)" (nodeRenamed)="renamedEvent($event)" *ngIf="!isSpinnerVisible"></tree>-->
-        <!--</div>-->
+        <div class="tree-box">
+            <tree [tree]="data" (nodeSelected)="logEvent($event)" (nodeRenamed)="renamedEvent($event)" *ngIf="!isSpinnerVisible"></tree>
+        </div>
     </div>
 </div>
 
