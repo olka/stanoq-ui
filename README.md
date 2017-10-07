@@ -3,6 +3,8 @@
 ## Further features
 
 Implement https://zoomcharts.com
+Change tree to http://ecomfe.github.io/esui-family/controls/index.html?control=Tree
+Current tree component is leaking
 0) CI support and autodeploy
 1) Map following on page scroll
 2) Connect left and right controls
